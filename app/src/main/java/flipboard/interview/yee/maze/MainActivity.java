@@ -2,8 +2,6 @@ package flipboard.interview.yee.maze;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
@@ -38,9 +36,6 @@ public class MainActivity extends Activity {
         mMazeInfo.setHasFixedSize(true);
         mMazeInfoAdapter = new MazeInfoAdapter(dataSet);
         mStartButton = (FloatingActionButton) findViewById(R.id.startButton);
-        int [][] colorPattern = new int[][]{new int[]{Color.parseColor("#D3503A")}};
-        ColorStateList red = new ColorStateList(colorPattern,colorPattern[0]);
-        mStartButton.setBackgroundTintList(red);
         mStartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {

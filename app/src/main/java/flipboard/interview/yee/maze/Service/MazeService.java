@@ -49,7 +49,6 @@ public class MazeService {
     Context mContext;
     URL mNewUrl;
     ProgressDialog mDialog;
-    //For testing use and didn't handle android data maintain like activity regenerate situation
     String id;
     int x = 0;
     int y = 0;
@@ -59,7 +58,7 @@ public class MazeService {
     boolean failed;
     String letter;
     ArrayList<int[]> adjacentArray;
-    //key: currentCoordinate value: previousCoordinate;
+    //key: currentCoordinate value: all its previousCoordinates;
     HashMap<int[], ArrayList<int[]>> stepMap;
     TreeMap<Integer, int[]> xPriorityMap;
     TreeMap<Integer, int[]> yPriorityMap;
