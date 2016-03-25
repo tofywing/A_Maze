@@ -56,6 +56,7 @@ public class MazeService {
     int[] current;
     boolean end;
     boolean failed;
+    boolean isRight = false;
     String letter;
     ArrayList<int[]> adjacentArray;
     //key: currentCoordinate value: all its previousCoordinates;
@@ -167,50 +168,63 @@ public class MazeService {
                             mCallBack.onMazeActionSuccess(new Maze(id, failed ? STATUS_FAILED : STATUS_SUCCESS, letter),
                                     mDialog);
                             mCallBack.onMazeActionFailed(mDialog);
-                        }
-                        if (stepMap.containsKey(current)) stepMapUpdateStep(current);
-                        else stepMapNewStep(current);
-                        letter += jsonData.optString("letter");
-                        JSONArray adjacent = jsonData.optJSONArray("adjacent");
-                        for (int i = 0; i < adjacent.length(); i++) {
-                            int x = adjacent.getJSONObject(i).optInt("x");
-                            int y = adjacent.getJSONObject(i).optInt("y");
-                            adjacentArray.add(new int[]{x, y});
-                        }
-                        if (adjacentArray.size() == 1) {
-                            previous = current;
-                            x = adjacentArray.get(0)[0];
-                            y = adjacentArray.get(0)[1];
                         } else {
-                            ArrayList<int[]> currentCheckArray = stepMap.get(current);
-                            for (int[] array : adjacentArray) {
-                                boolean pass = true;
-                                for (int[] checkArray : currentCheckArray) {
-                                    if (Arrays.equals(array, checkArray)) pass = false;
-                                }
-                                if (pass) {
-                                    int tempX = array[0];
-                                    int tempY = array[1];
-                                    isMoved = true;
-                                    prioritySample.add(new int[]{tempX, tempY});
-                                }
+                            if (stepMap.containsKey(current)) stepMapUpdateStep(current);
+                            else stepMapNewStep(current);
+                            letter += jsonData.optString("letter");
+                            JSONArray adjacent = jsonData.optJSONArray("adjacent");
+                            for (int i = 0; i < adjacent.length(); i++) {
+                                int x = adjacent.getJSONObject(i).optInt("x");
+                                int y = adjacent.getJSONObject(i).optInt("y");
+                                adjacentArray.add(new int[]{x, y});
                             }
-                            int[] tempArray = isMoved ? getBetterStep(prioritySample) : getBetterStep(adjacentArray);
-                            previous = new int[]{x, y};
-                            x = tempArray[0];
-                            y = tempArray[1];
+                            if (adjacentArray.size() == 1) {
+                                previous = current;
+                                x = adjacentArray.get(0)[0];
+                                y = adjacentArray.get(0)[1];
+                            } else {
+                                ArrayList<int[]> currentCheckArray = stepMap.get(current);
+                                for (int[] array : adjacentArray) {
+                                    boolean pass = true;
+                                    for (int[] checkArray : currentCheckArray) {
+                                        if (Arrays.equals(array, checkArray)) pass = false;
+                                    }
+                                    if (pass) {
+                                        int tempX = array[0];
+                                        int tempY = array[1];
+                                        isMoved = true;
+                                        prioritySample.add(new int[]{tempX, tempY});
+                                    }
+                                }
+//                                int[] tempArray = isMoved ? (isRight ? leftHandPriority(prioritySample) :
+//                                        rightHandPriority(prioritySample)) : leftHandPriority
+//                                        (adjacentArray);
+                                int[] tempArray;
+                                if (isMoved) {
+                                    if (isRight) {
+                                        tempArray = leftHandPriority(prioritySample);
+                                    } else tempArray = rightHandPriority(prioritySample);
+                                } else {
+                                    if (isRight) tempArray = leftHandPriority(adjacentArray);
+                                    else tempArray = leftHandPriority(adjacentArray);
+                                }
+                                isRight = !isRight;
+                                previous = new int[]{x, y};
+                                x = tempArray[0];
+                                y = tempArray[1];
+                            }
+                            current = new int[]{x, y};
+                            prioritySample.clear();
+                            xPriorityMap.clear();
+                            yPriorityMap.clear();
+                            _yPriorityMap.clear();
+                            _xPriorityMap.clear();
+                            adjacentArray.clear();
+                            mNewUrl = new URL(String.format(DOMAIN + URL_STEP_FORMAT, id, x, y));
+                            mDialog.setMessage(letter);
+                            isMoved = false;
+                            mazeInfo();
                         }
-                        current = new int[]{x, y};
-                        prioritySample.clear();
-                        xPriorityMap.clear();
-                        yPriorityMap.clear();
-                        _yPriorityMap.clear();
-                        _xPriorityMap.clear();
-                        adjacentArray.clear();
-                        mNewUrl = new URL(String.format(DOMAIN + URL_STEP_FORMAT, id, x, y));
-                        mDialog.setMessage(letter);
-                        isMoved = false;
-                        mazeInfo();
                     } catch (JSONException | IOException e) {
                         e.printStackTrace();
                     }
@@ -237,7 +251,7 @@ public class MazeService {
                 super.onPostExecute(s);
                 try {
                     JSONObject jsonData = new JSONObject(s);
-                    mCallBack.onMazeActionSuccess(null,mDialog);
+                    mCallBack.onMazeActionSuccess(null, mDialog);
                     mCallBack.onCheckActionSuccess(jsonData.optBoolean("success"));
                     mCallBack.onMazeActionFailed(mDialog);
                 } catch (JSONException e) {
@@ -280,7 +294,7 @@ public class MazeService {
         return stringBuilder.toString();
     }
 
-    int[] getBetterStep(ArrayList<int[]> prioritySample) {
+    int[] rightHandPriority(ArrayList<int[]> prioritySample) {
         int tempX;
         int tempY;
         int[] result = new int[]{0, 0};
@@ -329,6 +343,58 @@ public class MazeService {
         }
         return result;
     }
+
+
+    int[] leftHandPriority(ArrayList<int[]> prioritySample) {
+        int tempX;
+        int tempY;
+        int[] result = new int[]{0, 0};
+        for (int[] array : prioritySample) {
+            tempX = array[0];
+            tempY = array[1];
+            if (tempX < x) {
+                xPriorityMap.put(x - tempX, new int[]{tempX, tempY});
+            }
+        }
+        if (!xPriorityMap.isEmpty()) {
+            result = xPriorityMap.firstEntry().getValue();
+        } else {
+            for (int[] array : prioritySample) {
+                tempX = array[0];
+                tempY = array[1];
+                if (tempY > y) {
+                    yPriorityMap.put(tempY - y, new int[]{tempX, tempY});
+                }
+            }
+            if (!yPriorityMap.isEmpty()) {
+                result = yPriorityMap.firstEntry().getValue();
+            } else {
+                for (int[] array : prioritySample) {
+                    tempX = array[0];
+                    tempY = array[1];
+                    if (tempX > x) {
+                        _xPriorityMap.put(tempX - x, new int[]{tempX, tempY});
+                    }
+                }
+                if (!_xPriorityMap.isEmpty()) {
+                    result = _xPriorityMap.firstEntry().getValue();
+                } else {
+                    for (int[] array : prioritySample) {
+                        tempX = array[0];
+                        tempY = array[1];
+                        if (y > tempY) {
+                            _yPriorityMap.put(y - tempY, new int[]{tempX, tempY});
+                        }
+                    }
+                    if (!_yPriorityMap.isEmpty()) {
+                        result = _yPriorityMap.firstEntry().getValue();
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
 
     void stepMapNewStep(int[] current) {
         ArrayList<int[]> tempArray = new ArrayList<>();

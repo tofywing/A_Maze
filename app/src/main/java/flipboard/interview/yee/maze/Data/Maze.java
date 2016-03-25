@@ -14,6 +14,7 @@ public class Maze implements Parcelable {
     int status;
     String data;
 
+
     public Maze(String id, int status, String data) {
         this.id = id;
         this.status = status;

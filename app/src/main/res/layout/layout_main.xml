@@ -4,11 +4,11 @@
                 android:layout_height="match_parent">
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/startButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"/>
+    android:id="@+id/startButton"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentLeft="true"
+    android:layout_alignParentTop="true"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -17,6 +17,24 @@
         android:layout_marginTop="19dp"
         android:elevation="7dp"
         android:text="@string/button_maze"
+        android:textColor="@color/pureWhite"
+        android:textSize="14sp"
+        android:textStyle="bold"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/clearButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/clearButton"
+        android:layout_marginTop="19dp"
+        android:elevation="7dp"
+        android:text="@string/button_clear"
         android:textColor="@color/pureWhite"
         android:textSize="14sp"
         android:textStyle="bold"/>

@@ -4,6 +4,7 @@
     <string name="server_error">Data\u0027s not available from server.</string>
     <string name="maze_created">Maze created.</string>
     <string name="button_maze">Start</string>
+    <string name="button_clear">Clear</string>
     <string name="mazeInfo_status">Status: </string>
     <string name="mazeInfo_button_test">TEST</string>
     <string name="mazeInfo_ID">ID: </string>
