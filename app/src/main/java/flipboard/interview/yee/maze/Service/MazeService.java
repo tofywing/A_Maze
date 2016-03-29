@@ -1,7 +1,6 @@
 package flipboard.interview.yee.maze.Service;
 
 import android.app.ProgressDialog;
-import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
@@ -15,22 +14,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import flipboard.interview.yee.maze.CallBack.MazeServiceCallBack;
 import flipboard.interview.yee.maze.Data.Maze;
-import flipboard.interview.yee.maze.Data.MazeManager;
-import flipboard.interview.yee.maze.Data.ParseDate;
 import flipboard.interview.yee.maze.R;
 
 /**
@@ -194,6 +188,7 @@ public class MazeService {
                                         int tempY = array[1];
                                         isMoved = true;
                                         prioritySample.add(new int[]{tempX, tempY});
+                                        isRight = true;
                                     }
                                 }
 //                                int[] tempArray = isMoved ? (isRight ? leftHandPriority(prioritySample) :
@@ -201,14 +196,12 @@ public class MazeService {
 //                                        (adjacentArray);
                                 int[] tempArray;
                                 if (isMoved) {
-                                    if (isRight) {
-                                        tempArray = leftHandPriority(prioritySample);
-                                    } else tempArray = rightHandPriority(prioritySample);
+                                    tempArray = rightHandPriority(prioritySample);
+                                    isRight = true;
                                 } else {
                                     if (isRight) tempArray = leftHandPriority(adjacentArray);
-                                    else tempArray = leftHandPriority(adjacentArray);
+                                    else tempArray = rightHandPriority(adjacentArray);
                                 }
-                                isRight = !isRight;
                                 previous = new int[]{x, y};
                                 x = tempArray[0];
                                 y = tempArray[1];

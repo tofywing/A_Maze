@@ -9,13 +9,13 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import flipboard.interview.yee.maze.Adapter.MazeInfoAdapter;
 import flipboard.interview.yee.maze.CallBack.MazeServiceCallBack;
 import flipboard.interview.yee.maze.Data.Maze;
+import flipboard.interview.yee.maze.Data.MazeInfoManager;
 import flipboard.interview.yee.maze.Service.MazeService;
 
 /**
@@ -29,7 +29,8 @@ public class MainActivity extends Activity {
     MazeService mService;
     RecyclerView mMazeInfo;
     MazeInfoAdapter mMazeInfoAdapter;
-    ArrayList<Maze> dataSet = new ArrayList<>();
+    ArrayList<Maze> dataSet;
+    MazeInfoManager mMazeInfoManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,9 +39,11 @@ public class MainActivity extends Activity {
         mMazeInfo = (RecyclerView) findViewById(R.id.mazeInfoViewContainer);
         mMazeInfo.setLayoutManager(new LinearLayoutManager(this));
         mMazeInfo.setHasFixedSize(true);
+        mMazeInfoManager = new MazeInfoManager(this);
         if (savedInstanceState != null) {
-            Toast.makeText(this, "NOT", Toast.LENGTH_LONG).show();
             dataSet = savedInstanceState.getParcelableArrayList(MAZE_SAVED);
+        } else {
+            dataSet = mMazeInfoManager.getMazeInfo();
         }
         mMazeInfoAdapter = new MazeInfoAdapter(dataSet);
         mStartButton = (FloatingActionButton) findViewById(R.id.startButton);
@@ -84,6 +87,13 @@ public class MainActivity extends Activity {
             }
         });
         mMazeInfo.setAdapter(mMazeInfoAdapter);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        MazeInfoManager manager = new MazeInfoManager(this);
+        manager.saveMazeInfo(dataSet);
     }
 
     @Override
